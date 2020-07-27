@@ -1,6 +1,3 @@
 language = "python3"
-<<<<<<< HEAD
 run = "python homework.py"
-=======
-run = "python3 homework.py"
->>>>>>> origin/master
+
