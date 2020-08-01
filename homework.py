@@ -34,8 +34,7 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         amount_left = self.limit - self.today_stats
         if amount_left < 0:
-            return f'Сегодня можно съесть что-нибудь ещё, '
-            'но с общей калорийностью не более {amount_left} кКал'
+            return f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {amount_left} кКал'
         else:
             return f'Хватит есть!'
 
@@ -55,12 +54,13 @@ class CashCalculator(Calculator):
             currency = "rub"
         cash_balance = (self.limit - self.get_today_stats()) / self.exchange_rate.get(currency)[0]
         cash_balance = round(float(cash_balance), 2)
+        cash_name = self.exchange_rate.get(currency)[1]
         if cash_balance > 0:
-            return f"На сегодня осталось {cash_balance}"
+            return f"На сегодня осталось {cash_balance}{cash_name}"
         elif cash_balance == 0:
             return f"Денег нет, держись"
         elif cash_balance < 0:
-            return f"Денег нет, держись: твой долг - {cash_balance}"
+            return f"Денег нет, держись: твой долг - {abs(cash_balance)}{cash_name}"
 
 
 class Record:
@@ -71,11 +71,11 @@ class Record:
         if date is None:
             self.date = dt.date.today()
         else:
-            self.date = dt.datetime.strftime(date, date_format).date()
+            self.date = dt.datetime.strptime(date, date_format).date()
+
 
 if __name__ == "__main__":
     cash_calculator = CashCalculator(1000)
     cash_calculator.add_record(Record(amount=145, comment='кофе'))
     cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
-    #cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
     print(cash_calculator.get_today_cash_remained("rub"))
