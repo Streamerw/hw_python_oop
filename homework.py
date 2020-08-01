@@ -43,7 +43,7 @@ class CashCalculator(Calculator):
     USD_RATE = float(70.01)
     EURO_RATE = float(80.01)
     RUB_RATE = 1
-    exchange_rate = {
+    currencies = {
         'eur': (EURO_RATE, "Euro"),
         'usd': (USD_RATE, "USD"),
         'rub': (RUB_RATE, "руб")
@@ -52,15 +52,17 @@ class CashCalculator(Calculator):
     def get_today_cash_remained(self, currency=None):
         if currency is None:
             currency = "rub"
-        cash_balance = (self.limit - self.get_today_stats()) / self.exchange_rate.get(currency)[0]
-        cash_balance = round(float(cash_balance), 2)
-        cash_name = self.exchange_rate.get(currency)[1]
+        if currency not in self.currencies:
+            return f"неправильный курс"
+        cur_rate = self.currencies.get(currency)[0]
+        cur_name = self.currencies.get(currency)[1]
+        cash_balance = round(float((self.limit - self.get_today_stats()) / cur_rate), 2)
         if cash_balance > 0:
-            return f"На сегодня осталось {cash_balance}{cash_name}"
+            return f"На сегодня осталось {cash_balance} {cur_name}"
         elif cash_balance == 0:
             return f"Денег нет, держись"
         elif cash_balance < 0:
-            return f"Денег нет, держись: твой долг - {abs(cash_balance)}{cash_name}"
+            return f"Денег нет, держись: твой долг - {abs(cash_balance)} {cur_name}"
 
 
 class Record:
