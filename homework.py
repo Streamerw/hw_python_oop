@@ -1,27 +1,30 @@
 import datetime as dt
 
 date_format = '%d.%m.%Y'
+today = dt.datetime.now().date()
+week = dt.timedelta(days=7)
 
 class Calculator:
     def __init__(self, limit):
         self.limit = limit
         self.records = []
         self.today_stats = 0
-        self.week_stats = 0
+        self.week_stats = []
 
     def add_record(self, record):
         self.records.append(record)
 
     def get_today_stats(self):
         for i in self.records:
-            pass
+            if i.date == today:
+                self.today_stats += i.amount
         return self.today_stats
-
 
     def get_week_stats(self):
         for i in self.records:
-            pass
-        return self.week_stats
+            if today - week <= i.date <= today:
+                self.week_stats.append(i.amount)
+        return sum(self.week_stats)
 
 
 class CaloriesCalculator(Calculator):
@@ -38,47 +41,41 @@ class CaloriesCalculator(Calculator):
 
 
 class CashCalculator(Calculator):
-    def __init__(self, limit):
-        super().__init__(limit)
     USD_RATE = float(70.01)
     EURO_RATE = float(80.01)
     RUB_RATE = 1
+    exchange_rate = {
+        'eur': (EURO_RATE, "Euro"),
+        'usd': (USD_RATE, "USD"),
+        'rub': (RUB_RATE, "руб")
+    }
 
-    def get_today_cash_remained(self, currency):
-        self.currency = currency
-        exchange_rate = {
-            'eur': CashCalculator.EURO_RATE,
-            'usd': CashCalculator.USD_RATE,
-            'rub': CashCalculator.RUB_RATE
-        }
-        cash_balance = (self.limit - self.get_today_stats()) / self.conversion
-        self.cash_balance = abs(round(self.cash_balance, 2))
-        #balance = ?
+    def get_today_cash_remained(self, currency=None):
+        if currency is None:
+            currency = "rub"
+        cash_balance = (self.limit - self.get_today_stats()) / self.exchange_rate.get(currency)[0]
+        cash_balance = round(float(cash_balance), 2)
         if cash_balance > 0:
-            print(f"На сегодня осталось {self.cash_balance}")
+            return f"На сегодня осталось {cash_balance}"
         elif cash_balance == 0:
-            print(f"Денег нет, держись")
+            return f"Денег нет, держись"
         elif cash_balance < 0:
-            print(f"Денег нет, держись: твой долг - {self.cash_balance}")
+            return f"Денег нет, держись: твой долг - {cash_balance}"
 
 
 class Record:
     def __init__(self, amount, comment, date=None):
         self.amount = amount
         self.comment = comment
-        formatted_date = '%d.%m.%Y'
 
         if date is None:
             self.date = dt.date.today()
         else:
-            self.date = dt.datetime.strftime(date, formatted_date).date()
+            self.date = dt.datetime.strftime(date, date_format).date()
 
-
-cash_calculator = CashCalculator(1000)
-cash_calculator.add_record(Record(amount=145, comment='кофе'))
-cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
-#cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
-print(cash_calculator.get_today_cash_remained("rub"))
-
-# должно напечататься
-# На сегодня осталось 555 руб
+if __name__ == "__main__":
+    cash_calculator = CashCalculator(1000)
+    cash_calculator.add_record(Record(amount=145, comment='кофе'))
+    cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
+    #cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
+    print(cash_calculator.get_today_cash_remained("rub"))
