@@ -56,13 +56,12 @@ class CashCalculator(Calculator):
         cur_rate = self.currencies.get(currency)[0]
         cur_name = self.currencies.get(currency)[1]
         cash_balance = (self.limit - self.get_today_stats()) / cur_rate
-        cash_balance = round(abs(cash_balance), 2)
         if cash_balance > 0:
-            return f"На сегодня осталось {cash_balance:.2f} {cur_name}"
+            return f"На сегодня осталось {round(cash_balance, 2):.2f} {cur_name}"
         elif cash_balance == 0:
             return f"Денег нет, держись"
         elif cash_balance < 0:
-            return f"Денег нет, держись: твой долг - {cash_balance:.2f} {cur_name}"
+            return f"Денег нет, держись: твой долг - {round(abs(cash_balance), 2):.2f} {cur_name}"
 
 class CaloriesCalculator(Calculator):
     def __init__(self, limit):
@@ -77,8 +76,8 @@ class CaloriesCalculator(Calculator):
 
 
 if __name__ == "__main__":
-    cash_calculator = CashCalculator(0)
-    cash_calculator.add_record(Record(amount=145, comment='кофе'))
-    cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
-    cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
+    cash_calculator = CashCalculator(1)
+    cash_calculator.add_record(Record(amount=10, comment='кофе'))
+    #cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
+    #cash_calculator.add_record(Record(amount=100000, comment="бар в Танин др", date="08.11.2019"))
     print(cash_calculator.get_today_cash_remained("rub"))
