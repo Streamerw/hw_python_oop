@@ -4,7 +4,9 @@ date_format = '%d.%m.%Y'
 today = dt.datetime.now().date()
 week = dt.timedelta(days=7)
 
+
 class Calculator:
+
     def __init__(self, limit: float):
         self.limit = limit
         self.records = []
@@ -20,18 +22,18 @@ class Calculator:
         return today_stats
 
     def get_week_stats(self):
-        week_stats = 0
+        week_stats = []
         for record in self.records:
             if today - week <= record.date <= today:
-                week_stats += record
-        return week_stats
+                week_stats.append(record.amount)
+        return sum(week_stats)
 
 
 class Record:
+
     def __init__(self, amount: float, comment: str, date=None):
         self.amount = amount
         self.comment = comment
-
         if date is None:
             self.date = dt.date.today()
         else:
@@ -39,9 +41,9 @@ class Record:
 
 
 class CashCalculator(Calculator):
+    
     USD_RATE = 70.01
     EURO_RATE = 60.01
-
     currencies = {
         'usd': (USD_RATE, "USD"),
         'eur': (EURO_RATE, "Euro"),
@@ -63,7 +65,9 @@ class CashCalculator(Calculator):
         elif cash_balance < 0:
             return f"Денег нет, держись: твой долг - {round(abs(cash_balance), 2):.2f} {cur_name}"
 
+
 class CaloriesCalculator(Calculator):
+
     def __init__(self, limit):
         super().__init__(limit)
 
@@ -76,8 +80,9 @@ class CaloriesCalculator(Calculator):
 
 
 if __name__ == "__main__":
+
     cash_calculator = CashCalculator(1)
     cash_calculator.add_record(Record(amount=10, comment='кофе'))
-    #cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
-    #cash_calculator.add_record(Record(amount=100000, comment="бар в Танин др", date="08.11.2019"))
+    cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
+    cash_calculator.add_record(Record(amount=100000, comment="бар в Танин др", date="08.11.2019"))
     print(cash_calculator.get_today_cash_remained("rub"))
